@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "framework": null,
+  "buildCommand": "pnpm build",
+  "outputDirectory": "packages/web/dist",
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "installCommand": "pnpm install --frozen-lockfile"
+}
