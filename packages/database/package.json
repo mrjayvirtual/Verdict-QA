@@ -1,0 +1,13 @@
+{
+  "name": "@verdict/database",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "migrate": "node migrations/run.js",
+    "migrate:create": "node migrations/create.js",
+    "seed": "node seed/index.js"
+  },
+  "dependencies": {
+    "postgres": "^3.3.0"
+  }
+}
