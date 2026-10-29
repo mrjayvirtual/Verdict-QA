@@ -1,21 +1,22 @@
 {
   "name": "verdict-qa",
-  "description": "Verdict QA - Quality Assurance & Testing Platform",
+  "description": "Verdict QA - evidence-driven rubric intelligence and evaluation platform",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
-  "scripts": {
-    "dev": "pnpm --recursive --parallel run dev",
-    "build": "pnpm --recursive run build",
-    "lint": "eslint . --ext .ts,.tsx",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest",
-    "test:ui": "vitest --ui",
-    "test:e2e": "playwright test"
+  "packageManager": "pnpm@9.15.0",
+  "engines": {
+    "node": ">=20",
+    "pnpm": ">=9"
   },
-  "workspaces": [
-    "packages/*"
-  ],
+  "scripts": {
+    "dev": "pnpm --filter @verdict/web dev",
+    "build": "pnpm --filter @verdict/web build",
+    "build:all": "pnpm --recursive --if-present run build",
+    "typecheck": "pnpm --recursive --if-present run typecheck",
+    "lint": "eslint . --ext .ts,.tsx",
+    "test": "vitest run --passWithNoTests"
+  },
   "devDependencies": {
     "@types/node": "^20.0.0",
     "@typescript-eslint/eslint-plugin": "^6.0.0",
