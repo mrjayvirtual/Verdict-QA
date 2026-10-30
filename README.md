@@ -1,268 +1,181 @@
-# Verdict QA
+<div align="center">
 
-**Quality Assurance & Testing Platform** - Comprehensive testing, validation, and QA management system
+# VERDICT QA
 
-## Overview
+**Evidence-driven quality assurance for projects, AI outputs and competition submissions.**
 
-Verdict QA is a comprehensive platform for:
-- **Test Management** - Create, organize, and manage test cases
-- **Test Execution** - Execute tests and track results in real-time
-- **Bug Tracking** - Report, prioritize, and manage bugs
-- **Coverage Reports** - Monitor test coverage and quality metrics
-- **Team Collaboration** - Assign tasks, track progress, and communicate
-- **Automated Testing** - Integration with CI/CD pipelines
-- **Analytics & Insights** - Comprehensive dashboards and reports
+*Explains **why**. Shows the **evidence**. Names **what is wrong**. Recommends **how to fix it**. Verifies **whether the fix worked**.*
 
-## Tech Stack
+Built by **MRJAYVIRTUAL Technologies**
 
-- **Frontend:** React + TypeScript + Tailwind CSS + Vite
-- **Backend API:** Express.js + TypeScript + PostgreSQL
-- **Database:** PostgreSQL + Drizzle ORM
-- **Testing:** Jest + Playwright + Cypress
-- **Deployment:** Vercel (Frontend) + Railway/Render (Backend)
-- **Monorepo:** pnpm workspaces
+</div>
 
-## Project Structure
+---
+
+## The question Verdict answers
+
+> **"What's the competition's judging rubric?"**
+
+Most builders submit blind. Verdict turns published requirements into a structured, versioned rubric, evaluates a submission against it with traceable evidence, and closes the loop: it generates a targeted repair prompt for every failure, then re-evaluates and compares the result.
+
+## Project status (read this first)
+
+This README separates **what exists** from **what is planned**. Nothing below is marked built unless it is in the repository and verified.
+
+| Area | Status | Notes |
+|---|---|---|
+| pnpm monorepo (`web`, `api`, `database`, `shared-types`) | Present | Package scaffolds exist; `api`, `database` and `shared-types` source has not been audited yet |
+| Vercel configuration | **Repaired** | Duplicate `env` key removed, lockfile-safe install, SPA rewrites, security headers (commit `ace1ec5`) |
+| Toolchain pinning | **Repaired** | `packageManager: pnpm@9.15.0`, Node `>=20`, scripts scoped to real packages (commit `e6091bb`) |
+| Web application | Stub | Entry files only; the full interface is not built yet |
+| Rubric Intelligence | Planned | Specified in [`docs/RUBRIC_INTELLIGENCE.md`](docs/RUBRIC_INTELLIGENCE.md) |
+| Verdict evaluation engine | Planned | Specified in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) |
+| Closed-loop repair and re-evaluation | Planned | |
+| Authentication, persistence, analytics | Planned | |
+| Automated tests | Not yet written | No test results are claimed |
+| Production deployment | Pending | See [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md) |
+
+The full, ordered plan lives in [`docs/ROADMAP.md`](docs/ROADMAP.md).
+
+## Product vision
+
+Verdict evaluates whether a submission actually meets its requirements.
+
+1. **Discover** official requirements from authorized public sources, or accept URLs, PDFs, documents and pasted rules.
+2. **Structure** them into a rubric: criteria, weights, scales, required evidence, eligibility and disqualification rules.
+3. **Evaluate** a submission against that rubric with deterministic checks plus AI-based qualitative judgement.
+4. **Explain** every score with linked evidence, confidence and uncertainty.
+5. **Repair** by generating a coding-agent prompt for each unmet criterion.
+6. **Re-evaluate** after the fix and compare old versus new results.
+
+### Honesty rules (non-negotiable)
+
+- Never invent competition rules, evidence, scores or test results.
+- Every fact is labelled **Verified**, **Inferred** or **Unknown**.
+- Unpublished weights display **"Not specified"**, never a guess.
+- If no official rubric is found, Verdict says so and asks for the rules.
+- A failed AI provider call is **never** treated as a successful evaluation.
+- A fix is never marked executed or verified unless it actually was.
+- Official competition scores are kept separate from Verdict's internal quality scores.
+
+## Verdict statuses
+
+| Status | Meaning |
+|---|---|
+| `PASS` | All required criteria met with sufficient evidence |
+| `CONDITIONAL PASS` | Required criteria met; non-critical gaps remain |
+| `NEEDS REVIEW` | Insufficient evidence, judge disagreement, or provider failure |
+| `FAIL` | One or more required criteria unmet, or a disqualification rule triggered |
+
+## Differentiating features (planned)
+
+- **Evidence Graph** linking source, criterion, evidence, test and recommended fix
+- **Multi-Judge Consensus** with disagreements surfaced for human review
+- **Quality Regression Gate** for code, prompt and model changes
+- **Agent Repair** prompts generated from real findings
+- **Competition Readiness** for hackathons, accelerators, grants and AI challenges
+- **Human Review** with manual score adjustments and an audit trail
+- **Rubric Versioning** with impact analysis on prior evaluations
+- **Evaluation Analytics** from persisted data, not placeholder metrics
+- **GitHub Integration** tying findings to files and code locations
+- **Shareable Reports** with evidence, methodology and limitations
+
+## Architecture
+
+```mermaid
+flowchart LR
+  U[User] --> W[Web app - React + Vite]
+  W --> A[API - TypeScript]
+  A --> D[(PostgreSQL)]
+  A --> R[Rubric Intelligence]
+  A --> E[Verdict Engine]
+  R --> S[Authorized public sources]
+  E --> C[Deterministic checks]
+  E --> J[AI judges - configurable providers]
+  E --> G[Evidence Graph]
+  G --> X[Repair prompts]
+  X --> E
+```
+
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for details.
+
+## Repository structure
 
 ```
 .
 ├── packages/
-│   ├── web/                    # React frontend (Vite)
-│   ├── api/                    # Express API server
-│   ├── database/               # Database schema & migrations
-│   ├── shared-types/           # Shared TypeScript types
-│   ├── ui-components/          # Shared UI components
-│   └── test-utils/             # Testing utilities
-├── apps/
-│   └── cli/                    # Command-line interface
-├── scripts/                    # Build and utility scripts
-├── docker/                     # Docker configuration
-├── tests/                      # E2E and integration tests
-├── docs/                       # Documentation
-└── vercel.json                 # Vercel configuration
+│   ├── web/            # React + Vite frontend
+│   ├── api/            # Backend API
+│   ├── database/       # Schema and migrations
+│   └── shared-types/   # Types shared across packages
+├── docs/               # Architecture, rubric spec, roadmap, deployment, development
+├── docker/             # Container configuration
+├── .github/            # GitHub configuration
+├── docker-compose.yml
+├── pnpm-workspace.yaml
+├── tsconfig.json
+└── vercel.json
 ```
 
-## Getting Started
+## Getting started
 
-### Prerequisites
-
-- Node.js 18+
-- pnpm 8+
-- PostgreSQL 14+
-- Docker (optional, for local development)
-
-### Installation
+**Requirements:** Node.js 20+, pnpm 9+
 
 ```bash
-# Clone the repository
-git clone https://github.com/mrjayvirtual/verdict-QA.git
-cd verdict-QA
-
-# Install dependencies
+git clone https://github.com/mrjayvirtual/Verdict-QA.git
+cd Verdict-QA
 pnpm install
-
-# Set up environment variables
 cp .env.example .env.local
-
-# Start development servers
-pnpm dev
+pnpm dev          # starts the web app
 ```
 
-### Environment Setup
+| Command | Purpose |
+|---|---|
+| `pnpm dev` | Run the web app in development |
+| `pnpm build` | Build the web app (what Vercel runs) |
+| `pnpm build:all` | Build every package that defines a build script |
+| `pnpm typecheck` | Type-check every package that defines the script |
+| `pnpm test` | Run unit tests (passes with no tests while none exist) |
 
-```bash
-# Copy environment template
-cp .env.example .env.local
+## Environment variables
 
-# Edit with your configuration
-vim .env.local
-```
+See [`.env.example`](.env.example). **No secret is ever read by frontend code.** Only variables prefixed `VITE_` reach the browser, and none of them may hold credentials.
 
-Required variables:
-- `DATABASE_URL` - PostgreSQL connection string
-- `API_URL` - Backend API URL
-- `NEXTAUTH_SECRET` - Authentication secret (for NextAuth)
-- `JWT_SECRET` - JWT signing secret
-
-## Development
-
-### Commands
-
-```bash
-# Start all services in development mode
-pnpm dev
-
-# Build all packages
-pnpm build
-
-# Run type checking
-pnpm typecheck
-
-# Run linting
-pnpm lint
-
-# Run tests
-pnpm test
-
-# Run E2E tests
-pnpm test:e2e
-```
-
-### Specific Package Commands
-
-```bash
-# Frontend only
-pnpm --filter @verdict/web dev
-
-# API server only
-pnpm --filter @verdict/api dev
-
-# Database migrations
-pnpm --filter @verdict/database migrate
-```
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/register` - Register new user
-- `POST /auth/login` - Login user
-- `POST /auth/logout` - Logout user
-- `GET /auth/me` - Get current user
-
-### Test Cases
-- `GET /api/tests` - List all test cases
-- `POST /api/tests` - Create new test case
-- `GET /api/tests/:id` - Get test case details
-- `PUT /api/tests/:id` - Update test case
-- `DELETE /api/tests/:id` - Delete test case
-
-### Test Execution
-- `POST /api/executions` - Execute test case
-- `GET /api/executions/:id` - Get execution results
-- `GET /api/executions/:id/logs` - Get execution logs
-
-### Bug Management
-- `GET /api/bugs` - List all bugs
-- `POST /api/bugs` - Report new bug
-- `PUT /api/bugs/:id` - Update bug status
-- `DELETE /api/bugs/:id` - Close bug
-
-### Analytics
-- `GET /api/analytics/dashboard` - Dashboard metrics
-- `GET /api/analytics/coverage` - Test coverage report
-- `GET /api/analytics/trends` - Quality trends
-
-## Database Schema
-
-### Core Tables
-- `users` - User accounts and roles
-- `projects` - QA projects
-- `test_cases` - Test case definitions
-- `test_suites` - Grouped test cases
-- `test_executions` - Test run history
-- `test_results` - Individual test outcomes
-- `bugs` - Bug reports
-- `bug_comments` - Bug discussion
-- `attachments` - File uploads
-
-## Testing
-
-### Unit Tests
-```bash
-pnpm test
-```
-
-### Integration Tests
-```bash
-pnpm test:integration
-```
-
-### E2E Tests
-```bash
-pnpm test:e2e
-```
+| Variable | Scope | Purpose |
+|---|---|---|
+| `DATABASE_URL` | Server | PostgreSQL connection string |
+| `JWT_SECRET` | Server | Session signing secret |
+| `AI_PROVIDER` | Server | Which AI provider the judges use |
+| `AI_API_KEY` | Server | Provider credential; if missing, Verdict reports AI evaluation as unavailable |
+| `GITHUB_TOKEN` | Server | Optional; enables repository evaluation |
+| `CORS_ORIGIN` | Server | Allowed web origin |
+| `VITE_API_URL` | Browser | Public API base URL (no secrets) |
 
 ## Deployment
 
-### Frontend (Vercel)
-```bash
-# Automatic deployment on push to main
-# Configure in vercel.json
-```
+The frontend deploys to Vercel from `main` using the committed [`vercel.json`](vercel.json). Full steps, including the backend and database, are in [`docs/DEPLOYMENT.md`](docs/DEPLOYMENT.md).
 
-### Backend (Railway/Render)
-```bash
-# Set environment variables
-# Connect GitHub repository
-# Auto-deploy on push
-```
+## Security principles
 
-### Database Migrations
-```bash
-# Run migrations in production
-pnpm --filter @verdict/database migrate:prod
-```
+- Strict TypeScript and runtime validation of API inputs and AI outputs
+- Server-side credentials only; ownership enforced per project
+- Prompt-injection defenses for uploaded and retrieved content
+- Rate limiting, safe retries and audit history
 
-## CI/CD Pipeline
-
-Automated workflows:
-- **Lint & Type Check** - On every PR
-- **Run Tests** - On every PR
-- **Build** - On every PR
-- **Deploy Preview** - On PR creation (Vercel)
-- **Deploy Production** - On merge to main
+These are design requirements. Items are marked built only once implemented and verified.
 
 ## Contributing
 
-1. Create a feature branch (`git checkout -b feature/amazing-feature`)
-2. Commit changes (`git commit -m 'Add amazing feature'`)
-3. Push to branch (`git push origin feature/amazing-feature`)
-4. Open a Pull Request
-
-### Code Standards
-- Write unit tests for new features
-- Follow TypeScript strict mode
-- Use meaningful commit messages
-- Update documentation
-
-## Performance Monitoring
-
-- **Frontend:** Sentry for error tracking
-- **Backend:** Datadog for monitoring
-- **Database:** Query performance analysis
-- **API:** Response time tracking
-
-## Security
-
-- JWT-based authentication
-- Role-based access control (RBAC)
-- Encrypted sensitive data
-- CORS enabled for trusted domains
-- Rate limiting on API endpoints
-- SQL injection prevention via parameterized queries
-
-## Roadmap
-
-- [ ] AI-powered test suggestion
-- [ ] Mobile app for test execution
-- [ ] Integration with Jira, Azure DevOps
-- [ ] Advanced analytics and ML insights
-- [ ] Performance testing suite
-- [ ] Load testing integration
+See [`CONTRIBUTING.md`](CONTRIBUTING.md). Use conventional commits and never claim a feature or test result you have not run.
 
 ## License
 
-MIT - See LICENSE file for details
+MIT. See [`LICENSE`](LICENSE).
 
-## Support
+---
 
-For questions or issues:
-- Open a GitHub issue
-- Check existing documentation in `/docs`
-- Review API documentation in Swagger UI
+<div align="center">
 
-## Contact
+**VERDICT QA** · Built by **MRJAYVIRTUAL Technologies** · [github.com/mrjayvirtual](https://github.com/mrjayvirtual)
 
-- **Author:** mrjayvirtual
-- **Email:** mrjayvirtual@gmail.com
-- **GitHub:** https://github.com/mrjayvirtual
+</div>
