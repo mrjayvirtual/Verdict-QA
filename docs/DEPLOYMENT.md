@@ -1,71 +1,51 @@
-# Verdict QA - Production Checklist
+# Deployment
 
-## Pre-Deployment
+## Current state
 
-- [ ] All tests passing
-- [ ] TypeScript strict mode passes
-- [ ] No linting errors
-- [ ] Code reviewed by team
-- [ ] Database migrations tested
-- [ ] Environment variables set
-- [ ] Security audit passed
-- [ ] Performance benchmarks acceptable
+- The repository's `vercel.json` has been repaired and is ready for a Vercel build.
+- **A green production build has not been confirmed yet.** This document will be updated with the real result once a Vercel project linked to this repository completes a build.
+- The web package is currently a stub, so a successful build will deploy a placeholder, not the full product.
 
-## Frontend Deployment
+## Frontend on Vercel
 
-- [ ] Build succeeds locally
-- [ ] Build succeeds in CI
-- [ ] Static assets optimized
-- [ ] Images compressed
-- [ ] No console errors in production
-- [ ] Lighthouse score > 90
+Configuration is committed in [`vercel.json`](../vercel.json):
 
-## Backend Deployment
+| Setting | Value |
+|---|---|
+| Install command | `pnpm install --no-frozen-lockfile` (switch to `--frozen-lockfile` once `pnpm-lock.yaml` is committed) |
+| Build command | `pnpm --filter @verdict/web build` |
+| Output directory | `packages/web/dist` |
+| Routing | SPA rewrite to `/index.html`, excluding `/api/` and `/assets/` |
+| Headers | `nosniff`, `X-Frame-Options: DENY`, strict referrer policy, restricted permissions |
 
-- [ ] API endpoints tested
-- [ ] Database queries optimized
-- [ ] Error handling implemented
-- [ ] Logging configured
-- [ ] Health checks working
-- [ ] Rate limiting configured
+### Link the repository
 
-## Database Deployment
+1. In Vercel, choose **Add New > Project** and import `mrjayvirtual/Verdict-QA`.
+2. Leave **Framework Preset** as *Other*. Leave **Root Directory** empty. Build and output settings are read from `vercel.json`.
+3. Add environment variables (below) and deploy.
+4. Every push to `main` then triggers a production build.
 
-- [ ] Migrations tested in staging
-- [ ] Backup created before migration
-- [ ] Rollback plan documented
-- [ ] Indexes created where needed
-- [ ] Query performance validated
+> If you reuse an older Vercel project, check **Settings > Git** first. Make sure it points at this repository. A project linked to a different repository will build the wrong code.
 
-## Post-Deployment
+### Pitfall: stale redeploys
 
-- [ ] Monitor error logs
-- [ ] Check API response times
-- [ ] Verify database performance
-- [ ] User acceptance testing
-- [ ] Update documentation
-- [ ] Notify team of deployment
+The dashboard **Redeploy** button can re-run an old commit. To build the latest code, push a new commit.
 
-## Rollback Plan
+## Environment variables
 
-1. Revert to previous commit
-2. Run database rollback migration
-3. Clear cache/CDN
-4. Verify system health
-5. Post-mortem analysis
+See [`.env.example`](../.env.example) for the full list. At minimum for the frontend:
 
-## Monitoring
+- `VITE_API_URL` - public API base URL (never a secret)
 
-- Sentry for error tracking
-- DataDog for performance monitoring
-- Database query logs
-- API response time tracking
-- Uptime monitoring
+Backend variables (`DATABASE_URL`, `JWT_SECRET`, `CORS_ORIGIN`, `AI_PROVIDER`, `AI_API_KEY`, `GITHUB_TOKEN`) belong **only** on the API host.
 
-## Documentation Updates
+## Backend and database
 
-- [ ] API documentation updated
-- [ ] README reflects changes
-- [ ] CHANGELOG updated
-- [ ] Migration guide written
-- [ ] Team notified
+The API hosting model (serverless functions vs a Node host) is an open decision tracked in [`ROADMAP.md`](ROADMAP.md) Phase 2. Until the API exists, nothing needs to be deployed for it. Use any managed PostgreSQL service for `DATABASE_URL`.
+
+## Verification checklist
+
+- [ ] `pnpm install && pnpm build` succeeds from a clean checkout
+- [ ] Vercel build log shows a successful build for the latest `main` commit
+- [ ] The deployed URL loads and deep links resolve via the SPA rewrite
+- [ ] No secrets appear in the built bundle
